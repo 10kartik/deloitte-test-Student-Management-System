@@ -24,7 +24,7 @@ skill-test/
 ```bash
 cd backend
 npm install
-cp .env.example .env  # Configure your environment variables
+# .env file is already included with local development values
 npm start
 ```
 
@@ -42,7 +42,36 @@ npm run dev
   - Email: `admin@school-admin.com`
   - Password: `3OU4zn3q6Zh9`
 
-### ** Database Setup **
+### ** Database Setup (Docker - Recommended) **
+
+The easiest way to run the database is with Docker:
+
+```bash
+# 1. Spawn PostgreSQL container
+docker run --name school-db \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=school_mgmt \
+  -p 5432:5432 \
+  -d postgres:15
+
+# 2. Copy SQL files to container
+docker cp seed_db/tables.sql school-db:/tables.sql
+docker cp seed_db/seed-db.sql school-db:/seed-db.sql
+
+# 3. Seed the database
+docker exec -it school-db psql -U postgres -d school_mgmt -f /tables.sql
+docker exec -it school-db psql -U postgres -d school_mgmt -f /seed-db.sql
+```
+
+**Managing the database container:**
+```bash
+docker stop school-db   # Stop the container
+docker start school-db  # Start it again (data persists)
+docker rm -f school-db  # Remove completely (run docker run again to recreate)
+```
+
+### ** Database Setup (Local PostgreSQL) **
+If you prefer local PostgreSQL installation:
 ```bash
 # Create PostgreSQL database
 createdb school_mgmt
